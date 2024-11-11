@@ -88,14 +88,13 @@ body {
 
 #version-number {
     color: rgb(110, 110, 110);
-    font-family: Inter;
-    font-size: 12px;
-    font-weight: 400;
+    font-size: 10px;
+    font-weight: 800;
     line-height: 7px;
     letter-spacing: 0px;
     text-align: left;
     position: relative;
-    top: -4px;
+    top: -8px;
 }
 
 .window-controls {
@@ -170,6 +169,22 @@ body {
     height: 15px;
 }
 
+.license-content {
+    font-weight: 400;
+    height: 100%;
+    background: rgb(30, 30, 30);
+    border-radius: 8px;
+    padding: 16px;
+    flex: 1;
+    overflow-y: auto;
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    max-height: 300px;
+}
+
+
 .checkbox-wrapper {
     display: flex;
     align-items: center;
@@ -206,22 +221,6 @@ body {
 .custom-checkbox:hover {
     box-sizing: border-box;
     border: 2px solid rgb(102, 108, 255);
-}
-
-.license-content {
-    font-family: Be Vietnam Pro;
-    font-weight: 400;
-    height: 100%;
-    background: rgb(30, 30, 30);
-    border-radius: 8px;
-    padding: 16px;
-    flex: 1;
-    overflow-y: auto;
-    color: #fff;
-    font-size: 12px;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    max-height: 300px;
 }
 
 
@@ -376,7 +375,7 @@ body {
     color: #fff;
     font-size: 12px;
     white-space: pre-wrap;
-    max-height: 275px;
+    max-height: 300px;
     font-weight: 300;
 }
 
