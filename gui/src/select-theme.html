@@ -33,11 +33,7 @@
                             <div class="dropdown-item" id="steam-theme">SteamTheme</div>
                         </div>
                     </div>
-                    <div class="steam-path-selector" style="display: none;">
-                        <input id="steam-path-display" placeholder="" disabled></input>
-                        <button class="select-steam-path-button">Select Steam Path</button>
-                    </div>                    
-
+                    
                     <div class="popup" id="popup">You didn't select the theme.</div>
 
                     <div class="theme-options">
@@ -47,14 +43,6 @@
                                 <label class="checkbox-wrapper">
                                     <input type="checkbox" class="custom-checkbox" id="millennium-install">
                                     <p>with Millennium</p>
-                                </label>
-                                <label class="checkbox-wrapper">
-                                    <input type="checkbox" class="custom-checkbox" id="vencord-install">
-                                    <p>with Vencord</p>
-                                </label>
-                                <label class="checkbox-wrapper">
-                                    <input type="checkbox" class="custom-checkbox" id="betterdiscord-install">
-                                    <p>with BetterDiscord</p>
                                 </label>
                             </div>
                         </div>
@@ -104,17 +92,15 @@
 
         const backButton = document.querySelector('.nav-button.back');
         const nextButton = document.querySelector('.nav-button.next');
+        let selectedSteamPath = null;
 
         backButton.addEventListener('click', () => {
-            const everythingObject = document.querySelector('.everything');
-
             window.location.href = 'index.html';
         });
 
         document.getElementById('closeButton').addEventListener('click', () => {
             const windowElement = document.querySelector('.window');
             windowElement.classList.add('animate-zoom-out');
-
             ipcRenderer.send('close-window');
         });
 
@@ -145,10 +131,10 @@
         const installText = document.querySelector('#install-theme .theme-text');
         const resetText = document.querySelector('#reset-theme .theme-text');
         const uninstallText = document.querySelector('#uninstall-theme .theme-text');
-        const steamPathSelector = document.querySelector('.steam-path-selector');
-        const selectSteamPathButton = document.querySelector('.select-steam-path-button');
-        const steamPathDisplay = document.getElementById('steam-path-display');
-        let selectedSteamPath = null;
+        const millenniumInstallWrapper = document.getElementById('install-with');
+        const millenniumInstallCheckbox = document.getElementById('millennium-install');
+
+        millenniumInstallWrapper.style.display = 'none';
 
         themeSelector.addEventListener('click', (e) => {
             if (e.target.closest('.dropdown-item')) {
@@ -160,7 +146,7 @@
 
         const dropdownItems = document.querySelectorAll('.dropdown-item');
         dropdownItems.forEach(item => {
-            item.addEventListener('click', () => {
+            item.addEventListener('click', async () => {
                 const selectedTheme = item.textContent;
                 document.querySelector('.theme-selector-text').textContent = selectedTheme;
                 
@@ -168,30 +154,27 @@
                 resetText.textContent = `Reset ${selectedTheme}`;
                 uninstallText.textContent = `Uninstall ${selectedTheme}`;
                 
-                steamPathSelector.style.display = selectedTheme === 'SteamTheme' ? 'flex' : 'none';
-                
+                millenniumInstallWrapper.style.display = selectedTheme === 'SteamTheme' ? 'flex' : 'none';
+
+                if (selectedTheme === 'SteamTheme') {
+                    const result = await ipcRenderer.invoke('get-steam-path');
+                    if (result.success) {
+                        selectedSteamPath = result.path;
+                        if (selectedOption) {
+                            nextButton.classList.add('available');
+                        }
+                    } else {
+                        selectedSteamPath = null;
+                        nextButton.classList.remove('available');
+                    }
+                }
+
+                millenniumInstallWrapper.classList.toggle('fade-down', selectedTheme === 'SteamTheme');
+                millenniumInstallCheckbox.checked = false;
+
                 dropdownMenu.classList.remove('active');
                 themeSelector.classList.remove('active');
             });
-        });
-
-        selectSteamPathButton.addEventListener('click', async () => {
-            try {
-                const result = await ipcRenderer.invoke('select-steam-path');
-                if (result.success) {
-                    selectedSteamPath = result.path;
-                    steamPathDisplay.placeholder = `${result.path}`;
-                    if (selectedOption) {
-                        nextButton.classList.add('available');
-                    }
-                } else {
-                    steamPathDisplay.placeholder = 'Error selecting Steam path';
-                }
-            } catch (error) {
-                steamPathDisplay.placeholder = 'Error selecting Steam path';
-                selectedSteamPath = null;
-                nextButton.classList.remove('available');
-            }
         });
 
         const themeOptions = document.querySelectorAll('.theme-option');
@@ -230,13 +213,12 @@
 
         nextButton.addEventListener('click', async () => {
             if (!nextButton.classList.contains('available')) return;
-
-            const everythingObject = document.querySelector('.everything');
             
             ipcRenderer.send('start-installation', {
                 option: selectedOption,
                 theme: selectedTheme,
-                steamPath: selectedSteamPath
+                steamPath: selectedSteamPath,
+                millenniumInstall: millenniumInstallCheckbox.checked
             });
             window.location.href = 'logs.html';
         });

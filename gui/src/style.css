@@ -301,36 +301,6 @@ body {
 }
 
 
-.steam-path-selector {
-    gap: 6px;
-    justify-content: space-between;
-    margin: -6px 0 0;
-}
-
-#steam-path-display {
-    width: 100%;
-    padding: 0 12px;
-    font-weight: 600;
-    border: 2px solid rgb(60, 58, 61);
-    border-radius: 8px;
-    background-color: rgb(30, 30, 30);
-}
-
-.select-steam-path-button {
-    white-space: nowrap;
-    padding: 6px 12px;
-    border: 2px solid rgb(60, 58, 61);
-    border-radius: 8px;
-    color: #fff;
-    background-color: rgb(30, 30, 30);
-    cursor: pointer;
-}
-.select-steam-path-button:hover {
-    background-color: rgb(40, 40, 40);
-}
-
-
-
 .theme-options {
     flex: 1;
     display: flex;
@@ -381,7 +351,20 @@ body {
     color: #888;
 }
 
+@keyframes fadeDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
+.install-with.fade-down {
+    animation: fadeDown 0.3s ease-out;
+}
 
 .installation-header {
     display: flex;

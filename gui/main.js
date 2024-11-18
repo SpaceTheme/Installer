@@ -3,6 +3,8 @@ const path = require('path');
 const fs = require('fs');
 const https = require('https');
 const AdmZip = require('adm-zip');
+const { exec } = require('child_process');
+const Registry = require('winreg');
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -26,22 +28,27 @@ function createWindow() {
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-ipcMain.handle('select-steam-path', async () => {
-  const result = await dialog.showOpenDialog({
-    properties: ['openDirectory'],
-    title: 'Select Steam Installation Directory'
-  });
+ipcMain.handle('get-steam-path', async () => {
+  return new Promise((resolve) => {
+    const regKey = new Registry({
+      hive: Registry.HKLM,
+      key: '\\SOFTWARE\\WOW6432Node\\Valve\\Steam'
+    });
 
-  if (!result.canceled) {
-    const selectedPath = result.filePaths[0];
-    const steamExePath = path.join(selectedPath, 'steam.exe');
-    if (fs.existsSync(steamExePath)) {
-      return { success: true, path: selectedPath };
-    } else {
-      return { success: false, error: 'Invalid Steam directory. Please select the valid Steam directory.' };
-    }
-  }
-  return { success: false, error: 'Selection cancelled' };
+    regKey.get('InstallPath', (err, item) => {
+      if (err) {
+        resolve({ success: false, error: 'Steam registry key not found' });
+        return;
+      }
+
+      const steamPath = item.value;
+      if (fs.existsSync(path.join(steamPath, 'steam.exe'))) {
+        resolve({ success: true, path: steamPath });
+      } else {
+        resolve({ success: false, error: 'Steam installation not found at registry path' });
+      }
+    });
+  });
 });
 
 ipcMain.on('start-installation', async (event, data) => {
@@ -140,9 +147,31 @@ ipcMain.on('start-installation', async (event, data) => {
       sendLog(`Installation failed: ${error.message}`);
     }
 
-  } else if (data.theme === 'SteamTheme') {
+} else if (data.theme === 'SteamTheme') {
     await delay(1000);
     
+    if (data.millenniumInstall) {
+      sendLog('Starting Millennium installation...');
+      const powershellCommand = `start powershell.exe -ExecutionPolicy Bypass -File "${path.join(__dirname, 'src/assets/millennium.ps1')}"`;
+      
+      try {
+        await new Promise((resolve, reject) => {
+          exec(powershellCommand, (error, stdout, stderr) => {
+            if (error) {
+              sendLog(`Millennium installation error: ${error.message}`);
+              reject(error);
+              return;
+            }
+            sendLog('Millennium installation completed successfully');
+            resolve();
+          });
+        });
+      } catch (error) {
+        sendLog(`Failed to install Millennium: ${error.message}`);
+        return;
+      }
+    }
+
     const skinsFolder = path.join(data.steamPath, 'steamui', 'skins');
     const destinationFolder = path.join(skinsFolder, 'SpaceTheme For Steam');
     const tempPath = path.join(process.env.TEMP, 'SpaceTheme_for_Steam.zip');
@@ -187,7 +216,7 @@ ipcMain.on('start-installation', async (event, data) => {
       }
 
       if (!fs.existsSync(skinsFolder)) {
-        sendLog('Steam skins folder not found. Please install Millennium/Steam first.');
+        sendLog('Steam skins folder not found. Please install Millennium first.');
         return;
       }
 
