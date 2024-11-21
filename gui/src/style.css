@@ -398,7 +398,10 @@ body {
 
 .logs-content {
     overflow-y: auto;
+    position: relative;
+    display: flex;
     flex: 1;
+    flex-direction: column;
     max-height: 300px;
     padding: 16px;
     font-size: 12px;
@@ -407,6 +410,18 @@ body {
     border-radius: 8px;
     color: #fff;
     background-color: rgb(30, 30, 30);
+}
+
+.copy-logs {
+    aspect-ratio: 1 / 1;
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    display: flex;
+    justify-content: center;
+    padding: 12px;
+    border-radius: 8px;
+    background-color: #111111;
 }
 
 
@@ -511,6 +526,10 @@ body {
     border: 2px solid rgb(239, 75, 75);
     color: white;
     background-color: rgb(239, 75, 75, 17%);
+}
+.copy-popup {
+    border: 2px solid rgb(75, 137, 239);
+    background-color: rgb(75, 137, 239, 17%);
 }
 
 .nav-button.next.available {

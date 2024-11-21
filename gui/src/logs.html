@@ -33,7 +33,13 @@
                             <span>Installation</span>
                         </div>
                     </div>
-                    <div class="logs-content"></div>
+                    <div class="logs-content">
+                        <div class="copy-logs">
+                            <img src="assets/copy.svg">
+                        </div>
+                    </div>
+
+                    <div class="copy-popup popup" id="popup">Copied!</div>
                 </div>
 
                 <div class="footer">
@@ -153,6 +159,37 @@
             const everythingObject = document.querySelector('.everything');
             
             window.location.href = 'select-theme.html';
+        });
+    </script>
+    <script>
+        const copyLogsButton = document.querySelector('.copy-logs');
+        const popup = document.getElementById('popup');
+
+        copyLogsButton.addEventListener('click', () => {
+            const logsContent = document.querySelector('.logs-content');
+            const logEntries = logsContent.querySelectorAll('.log-entry');
+            const textToCopy = '```\n' + Array.from(logEntries).map(entry => entry.textContent).join('\n') + '\n```';
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                popup.style.visibility = 'visible';
+                popup.style.opacity = '1';
+                
+                setTimeout(() => {
+                    popup.style.opacity = '0';
+                    popup.style.visibility = 'hidden';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy logs:', err);
+            });
+        });
+
+        copyLogsButton.addEventListener('mouseenter', () => {
+            copyLogsButton.style.opacity = '0.8';
+            copyLogsButton.style.cursor = 'pointer';
+        });
+
+        copyLogsButton.addEventListener('mouseleave', () => {
+            copyLogsButton.style.opacity = '1';
         });
     </script>
 </body>
