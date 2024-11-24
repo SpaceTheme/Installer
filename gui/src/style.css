@@ -520,12 +520,19 @@ body {
     bottom: 90px;
     left: 50%;
     transform: translateX(-50%);
-    display: none;
+    visibility: hidden;
+    opacity: 0;
     padding: 10px 20px;
     border-radius: 8px;
     border: 2px solid rgb(239, 75, 75);
     color: white;
     background-color: rgb(239, 75, 75, 17%);
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.copy-popup {
+    border: 2px solid rgb(75, 137, 239);
+    background-color: rgb(75, 137, 239, 17%);
 }
 .copy-popup {
     border: 2px solid rgb(75, 137, 239);

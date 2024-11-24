@@ -184,10 +184,13 @@
         let selectedTheme = null;
 
         function showPopup() {
-            popup.style.display = 'block';
+            popup.style.visibility = 'visible';
+            popup.style.opacity = '1';
+                
             setTimeout(() => {
-                popup.style.display = 'none';
-            }, 3000);
+                popup.style.opacity = '0';
+                popup.style.visibility = 'hidden';
+            }, 2000);
         }
 
         themeOptions.forEach(option => {
